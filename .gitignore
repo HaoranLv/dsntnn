@@ -17,7 +17,9 @@ core
 # Pweave outputs
 /examples/*.html
 /examples/figures/
-data/
+data/tv
+data/images
+
 
 # setup.py outputs
 /*.egg-info/
