@@ -15,7 +15,7 @@
 """
 DSNT (soft-argmax) operations for use in PyTorch computation graphs.
 """
-
+import torch.nn as nn
 from functools import reduce
 from operator import mul
 
@@ -118,6 +118,11 @@ def flat_softmax(inp):
     flat = torch.nn.functional.softmax(flat, -1)
     return flat.view(*orig_size)
 
+class Euclidean_losses(nn.Module):
+    def __init__(self):
+        super(Euclidean_losses, self).__init__()
+    def forward(self, actual, target):
+        return torch.norm(actual - target, p=2, dim=-1, keepdim=False)
 
 def euclidean_losses(actual, target):
     """Calculate the Euclidean losses for multi-point samples.
@@ -209,6 +214,11 @@ def make_gauss(means, size, sigma, normalize=True):
     val_sum = reduce(lambda t, dim: t.sum(dim, keepdim=True), dim_range, gauss) + 1e-24
     return gauss / val_sum
 
+class Average_loss(nn.Module):
+    def __init__(self):
+        super(Average_loss, self).__init__()
+    def forward(self, losses, mask=None):
+        return average_loss(losses, mask=mask)
 
 def average_loss(losses, mask=None):
     """Calculate the average of per-location losses.
@@ -271,6 +281,11 @@ def kl_reg_losses(heatmaps, mu_t, sigma_t):
 
     return _divergence_reg_losses(heatmaps, mu_t, sigma_t, _kl)
 
+class Js_reg_losses(nn.Module):
+    def __init__(self):
+        super(Js_reg_losses, self).__init__()
+    def forward(self, heatmaps, mu_t, sigma_t):
+        return _divergence_reg_losses(heatmaps, mu_t, sigma_t, _js)
 
 def js_reg_losses(heatmaps, mu_t, sigma_t):
     """Calculate Jensen-Shannon divergences between heatmaps and target Gaussians.
